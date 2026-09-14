@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JailbrikMe iso 16  </title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Phone Container to mimic a mobile screen if viewed on desktop */
+        .phone-screen {
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            max-height: 800px;
+            background: linear-gradient(to bottom, #1a1a1a, #0a0a0a);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        /* Header Info */
+        .header {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
+        .logo span {
+            font-weight: 600;
+            color: #3880ff;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #8e8e93;
+            font-weight: 400;
+        }
+
+        /* Interactive / Status Area */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Console / Progress Box */
+        .status-box {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            display: none; /* Hidden until triggered */
+            text-align: left;
+        }
+
+        .status-text {
+            font-family: monospace;
+            font-size: 13px;
+            color: #00ff00;
+            margin-bottom: 15px;
+            min-height: 40px;
+            line-height: 1.4;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #3880ff;
+            transition: width 0.4s ease;
+        }
+
+        /* The Classic Slider */
+        .slider-wrapper {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 40px;
+            height: 64px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            margin-bottom: 40px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .slider-text {
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #4d4d4d 0%, #fff 50%, #4d4d4d 100%);
+            background-size: 80px;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 2.5s infinite linear;
+            position: absolute;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .slider-handle {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(to bottom, #ffffff, #cccccc);
+            border-radius: 50%;
+            cursor: grab;
+            position: absolute;
+            left: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            z-index: 2;
+            transition: transform 0.1s ease-out;
+        }
+
+        .slider-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Arrow icon inside handle */
+        .slider-handle::after {
+            content: "➔";
+            color: #333;
+            font-size: 20px;
+        }
+
+        /* Classic Shimmer Animation */
+        @keyframes shine {
+            0% { background-position: -40px; }
+            100% { background-position: 160px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-screen">
+
+    <!-- Top Branding -->
+    <div class="header">
+        <div class="logo">jailbreak<span>me</span></div>
+        <div class="subtitle">Web-Based Jailbrikme made by amirhacks</div>
+    </div>
+
+    <!-- Middle UI (Flips between empty space and progress logs) -->
+    <div class="main-content">
+        <div class="status-box" id="statusBox">
+            <div class="status-text" id="statusText">Ready...</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Slider -->
+    <div class="slider-wrapper" id="sliderWrapper">
+        <div class="slider-text" id="sliderText">slide to jailbreak</div>
+        <div class="slider-handle" id="sliderHandle"></div>
+    </div>
+
+</div>
+
+<script>
+    const handle = document.getElementById('sliderHandle');
+    const wrapper = document.getElementById('sliderWrapper');
+    const sliderText = document.getElementById('sliderText');
+    const statusBox = document.getElementById('statusBox');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+
+    let isDragging = false;
+    let startX = 0;
+    let maxTrackWidth = 0;
+
+    // Calculate limits dynamically
+    function updateLimits() {
+        maxTrackWidth = wrapper.clientWidth - handle.clientWidth - 8; // 8px for left/right paddings
+    }
+    window.addEventListener('resize', updateLimits);
+    updateLimits();
+
+    // Drag Event Listeners (Supports Mouse & Touch)
+    handle.addEventListener('mousedown', dragStart);
+    handle.addEventListener('touchstart', dragStart, { passive: true });
+
+    document.addEventListener('mousemove', dragMove);
+    document.addEventListener('touchmove', dragMove, { passive: false });
+
+    document.addEventListener('mouseup', dragEnd);
+    document.addEventListener('touchend', dragEnd);
+
+    function dragStart(e) {
+        isDragging = true;
+        handle.style.transition = 'none';
+        startX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+    }
+
+    function dragMove(e) {
+        if (!isDragging) return;
+
+        // Prevent scrolling page while sliding on mobile
+        if (e.type === 'touchmove') e.preventDefault();
+
+        const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+        let deltaX = currentX - startX;
+
+        // Restrict movement bounds
+        if (deltaX < 0) deltaX = 0;
+        if (deltaX > maxTrackWidth) deltaX = maxTrackWidth;
+
+        handle.style.transform = `translateX(${deltaX}px)`;
+
+        // Fade out the helper text as you slide
+        const opacity = 1 - (deltaX / maxTrackWidth);
+        sliderText.style.opacity = opacity;
+
+        // Trigger action if pushed all the way right
+        if (deltaX >= maxTrackWidth) {
+            isDragging = false;
+            triggerJailbreak();
+        }
+    }
+
+    function dragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+
+        // Snap back if let go early
+        handle.style.transition = 'transform 0.3s ease-out';
+        handle.style.transform = 'translateX(0px)';
+        sliderText.style.opacity = 1;
+    }
+
+    // Fake Execution Sequence
+    function triggerJailbreak() {
+        // Hide the slider smoothly
+        wrapper.style.transition = 'opacity 0.5s ease';
+        wrapper.style.opacity = '0';
+        setTimeout(() => wrapper.style.display = 'none', 500);
+
+        // Show and start logs
+        statusBox.style.display = 'block';
+
+        const steps = [
+            { text: "Locating user space vulnerability...", time: 1000, progress: 20 },
+            { text: "Bypassing sandbox restrictions...", time: 2200, progress: 45 },
+            { text: "Patching kernel memory maps...", time: 3500, progress: 75 },
+            { text: "Injecting Cydia environment...", time: 4800, progress: 95 },
+            { text: "Jailbreak Complete! (Simulated)", time: 5500, progress: 100 }
+        ];
+
+        steps.forEach(step => {
+            setTimeout(() => {
+                statusText.innerText = step.text;
+                progressBar.style.width = `${step.progress}%`;
+
+                if(step.progress === 100) {
+                    statusText.style.color = '#3880ff';
+                }
+            }, step.time);
+        });
+    }
+</script>
+</body>
+</html>
