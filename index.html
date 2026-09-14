@@ -1,321 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JailbrikMe iso 16</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>JAILBRIK NA by Amirhacks</title>
+  
+  <!-- iOS Home Screen App Capabilities -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cydia">
+  
+  <!-- Dynamically generated Cydia Icon -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='[w3.org](http://www.w3.org/2000/svg)' width='180' height='180' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23631919'/><path d='M90 35 C50 35 35 65 35 90 C35 125 60 145 90 145 C120 145 145 125 145 90 C145 65 130 35 90 35 Z' stroke='%23ffffff' stroke-width='8' fill='none'/><text x='90' y='105' font-family='sans-serif' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>C</text></svg>">
 
-        body {
-            background-color: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #fff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-        /* Phone Container to mimic a mobile screen if viewed on desktop */
-        .phone-screen {
-            width: 100%;
-            max-width: 400px;
-            height: 100%;
-            max-height: 800px;
-            background: linear-gradient(to bottom, #1a1a1a, #0a0a0a);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 20px;
-            border: 1px solid #333;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-        }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0d0d11;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
 
-        /* Header Info */
-        .header {
-            text-align: center;
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    /* Container for Header & Controls */
+    .container {
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
-        /* Platform OS Detector Box sa pinakataas na gitna */
-        .os-detector {
-            font-size: 11px;
-            color: #3880ff;
-            background: rgba(56, 128, 255, 0.15);
-            border: 1px solid rgba(56, 128, 255, 0.3);
-            border-radius: 20px;
-            padding: 6px 16px;
-            display: inline-block;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 0%, #888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        .logo {
-            font-size: 32px;
-            font-weight: 300;
-            letter-spacing: -0.5px;
-            margin-bottom: 5px;
-        }
+    p.subtitle {
+      color: #a0a0ab;
+      font-size: 0.95rem;
+      margin-top: 0;
+      margin-bottom: 24px;
+    }
 
-        .logo span {
-            font-weight: 600;
-            color: #3880ff;
-        }
+    /* Console Log Display */
+    .console-box {
+      width: 100%;
+      height: 260px;
+      background-color: #16161c;
+      border: 1px solid #282832;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.85rem;
+      color: #35d499;
+      text-align: left;
+      overflow-y: auto;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
+    }
 
-        .subtitle {
-            font-size: 14px;
-            color: #8e8e93;
-            font-weight: 400;
-        }
+    .log-line {
+      margin: 4px 0;
+      line-height: 1.4;
+      word-break: break-all;
+    }
 
-        /* Interactive / Status Area */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
+    .log-line.error { color: #ff5555; }
+    .log-line.system { color: #a0a0ab; }
+    .log-line.success { color: #50fa7b; font-weight: bold; }
 
-        /* Console / Progress Box */
-        .status-box {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            display: none;
-            text-align: left;
-        }
+    /* Action Button */
+    .btn-jailbreak {
+      width: 100%;
+      max-width: 320px;
+      padding: 18px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: linear-gradient(180deg, #007aff 0%, #0056b3 100%);
+      border: none;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
 
-        .status-text {
-            font-family: monospace;
-            font-size: 11px;
-            color: #00ff00;
-            margin-bottom: 15px;
-            height: 240px;
-            line-height: 1.5;
-            white-space: pre-line;
-            overflow-y: auto;
-        }
+    .btn-jailbreak:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
 
-        .progress-bar-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-        }
+    .btn-jailbreak:disabled {
+      background: #33333a;
+      color: #777780;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
 
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: #3880ff;
-            transition: width 0.5s ease;
-        }
+    /* Fake Notification Modal */
+    .notification-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
 
-        /* The Classic Slider */
-        .slider-wrapper {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 40px;
-            height: 64px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            padding: 4px;
-            margin-bottom: 40px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-            touch-action: none; /* Pinipigilan ang mobile browser scroll habang nagda-drag */
-        }
+    .notification-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-        .slider-text {
-            width: 100%;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.5);
-            background: linear-gradient(to right, #4d4d4d 0%, #fff 50%, #4d4d4d 100%);
-            background-size: 80px;
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 2.5s infinite linear;
-            position: absolute;
-            left: 0;
-            pointer-events: none;
-        }
+    .alert-box {
+      width: 270px;
+      background: rgba(30, 30, 30, 0.9);
+      border-radius: 14px;
+      text-align: center;
+      color: white;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
 
-        .slider-handle {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(to bottom, #ffffff, #cccccc);
-            border-radius: 50%;
-            cursor: grab;
-            position: absolute;
-            left: 4px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
-            z-index: 2;
-            transition: transform 0.1s ease-out;
-            touch-action: none;
-        }
+    .alert-content {
+      padding: 20px;
+    }
 
-        .slider-handle:active {
-            cursor: grabbing;
-        }
+    .alert-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
 
-        /* Arrow icon inside handle */
-        .slider-handle::after {
-            content: "➔";
-            color: #333;
-            font-size: 20px;
-        }
+    .alert-desc {
+      font-size: 0.85rem;
+      color: #d0d0d0;
+      line-height: 1.3;
+    }
 
-        /* Classic Shimmer Animation */
-        @keyframes shine {
-            0% { background-position: -40px; }
-            100% { background-position: 160px; }
-        }
-    </style>
+    .alert-actions {
+      border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+    }
+
+    .alert-button {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: #0a84ff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* PWA Prompt Banner */
+    .pwa-banner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: #1c1c1e;
+      border: 1px solid #38383a;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #cccccc;
+      z-index: 999;
+    }
+
+    .pwa-banner span {
+      font-weight: bold;
+      color: #ffffff;
+    }
+  </style>
 </head>
 <body>
 
-<div class="phone-screen">
+  <div class="container">
+    <h1>JailbreakMe</h1>
+    <p class="subtitle">iOS 15.0 - 17.5.1 Automated Installer</p>
 
-    <!-- Top Branding & Dynamic System Scanner -->
-    <div class="header">
-        <div class="os-detector" id="osDetector">Detecting System...</div>
-        <div class="logo">jailbreak<span>me</span></div>
-        <div class="subtitle">Web-Based Jailbrikme made by amirhacks</div>
+    <!-- Terminal Output Box -->
+    <div class="console-box" id="console">
+      <div class="log-line system">[i] Device connected: iPhone (arm64e)</div>
+      <div class="log-line system">[i] Ready to initialize...</div>
     </div>
 
-    <!-- Middle UI (Flips between empty space and progress logs) -->
-    <div class="main-content">
-        <div class="status-box" id="statusBox">
-            <div class="status-text" id="statusBoxText">Ready...</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-        </div>
+    <!-- Main Action Button -->
+    <button class="btn-jailbreak" id="actionBtn" onclick="startJailbreak()">Jailbreak</button>
+  </div>
+
+  <!-- iOS System Alert -->
+  <div class="notification-overlay" id="alertModal">
+    <div class="alert-box">
+      <div class="alert-content">
+        <div class="alert-title">Jailbreak Complete</div>
+        <div class="alert-desc">Your phone is jailbroken! Cydia has been staged for your Home Screen.</div>
+      </div>
+      <div class="alert-actions">
+        <button class="alert-button" onclick="closeAlert()">Open Cydia</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Bottom Slider -->
-    <div class="slider-wrapper" id="sliderWrapper">
-        <div class="slider-text" id="sliderText">slide to jailbreak</div>
-        <div class="slider-handle" id="sliderHandle"></div>
-    </div>
+  <!-- Add to Home Screen Instructions Banner -->
+  <div class="pwa-banner" id="pwaBanner">
+    To complete Cydia installation: Tap <span>Share</span> <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" style="display:inline; vertical-align:middle;"><path d="M6 0L1 5h3.5v6h3V5H11L6 0zM0 14h12v2H0v-2z"/></svg> then select <span>'Add to Home Screen'</span>.
+  </div>
 
-</div>
+  <script>
+    // Sequence of log lines with delays (in milliseconds) simulating 2-3 minutes total runtime (~140 seconds)
+    const logs = [
+      { text: "[*] Initializing environment...", delay: 2000 },
+      { text: "[*] Validating system parameters...", delay: 4000 },
+      { text: "[*] Reading kernel memory struct...", delay: 6000 },
+      { text: "[*] Locating kernel base offset...", delay: 8000 },
+      { text: "[+] Found Kernel Base: 0xfffffff007004000", delay: 10000 },
+      { text: "[*] Running exploit strategy (1/4)...", delay: 12000 },
+      { text: "[*] Bypassing PAC (Pointer Authentication Code)...", delay: 18000 },
+      { text: "[*] Escalating task port privileges...", delay: 25000 },
+      { text: "[+] Obtained tfp0 master port: 0x103", delay: 32000 },
+      { text: "[*] Patching AMFI (Apple Mobile File Integrity)...", delay: 40000 },
+      { text: "[*] Disabling Sandbox restrictions...", delay: 48000 },
+      { text: "[*] Running exploit strategy (2/4)...", delay: 55000 },
+      { text: "[*] Disabling hardware watchdog timer...", delay: 65000 },
+      { text: "[*] Unmounting root filesystem...", delay: 75000 },
+      { text: "[*] Remounting / writeable...", delay: 85000 },
+      { text: "[+] RootFS remounted successfully.", delay: 92000 },
+      { text: "[*] Running exploit strategy (3/4)...", delay: 100000 },
+      { text: "[*] Extracting Cydia package payload...", delay: 108000 },
+      { text: "[*] Installing bootstrap dependencies...", delay: 116000 },
+      { text: "[*] Injecting dyld shared cache patches...", delay: 124000 },
+      { text: "[*] Running exploit strategy (4/4)...", delay: 130000 },
+      { text: "[*] Rebuilding launch daemon cache...", delay: 136000 },
+      { text: "[+] Exploitation clean & successful!", delay: 140000, style: "success" },
+      { text: "[*] Finalizing installation...", delay: 142000 }
+    ];
 
-<script>
-    const handle = document.getElementById('sliderHandle');
-    const wrapper = document.getElementById('sliderWrapper');
-    const sliderText = document.getElementById('sliderText');
-    const statusBox = document.getElementById('statusBox');
-    const statusBoxText = document.getElementById('statusBoxText');
-    const progressBar = document.getElementById('progressBar');
-    const osDetector = document.getElementById('osDetector');
+    const consoleBox = document.getElementById("console");
+    const actionBtn = document.getElementById("actionBtn");
+    const alertModal = document.getElementById("alertModal");
+    const pwaBanner = document.getElementById("pwaBanner");
 
-    let isDragging = false;
-    let startX = 0;
-    let currentTransformX = 0;
-    let maxTrackWidth = 0;
-
-    // Automatic Environment Engine para basahin kung iOS o Android ang nagbukas
-    function runSystemDetection() {
-        const ua = navigator.userAgent;
-        if (/iPhone|iPad|iPod/.test(ua)) {
-            const match = ua.match(/OS (\d+)_(\d+)/);
-            if (match) {
-                osDetector.innerText = `iOS ${match[1]}.${match[2]} Device Connected`;
-            } else {
-                osDetector.innerText = "iOS Device Connected";
-            }
-        } else if (/Android/.test(ua)) {
-            const match = ua.match(/Android (\d+)/);
-            if (match) {
-                osDetector.innerText = `Android ${match[1]} Environment`;
-            } else {
-                osDetector.innerText = "Android Environment Detected";
-            }
-        } else if (/Windows/.test(ua)) {
-            osDetector.innerText = "Windows Machine Platform";
-        } else if (/Macintosh/.test(ua)) {
-            osDetector.innerText = "macOS Workstation";
-        } else if (/Linux/.test(ua)) {
-            osDetector.innerText = "Linux OS Environment";
-        } else {
-            osDetector.innerText = "64-Bit System Architecture";
-        }
+    function logMessage(text, className = "") {
+      const line = document.createElement("div");
+      line.className = `log-line ${className}`;
+      line.textContent = text;
+      consoleBox.appendChild(line);
+      consoleBox.scrollTop = consoleBox.scrollHeight;
     }
 
-    function updateLimits() {
-        maxTrackWidth = wrapper.clientWidth - handle.clientWidth - 8;
-    }
-    window.addEventListener('resize', updateLimits);
-    
-    window.onload = () => {
-        updateLimits();
-        runSystemDetection();
-    };
+    function startJailbreak() {
+      actionBtn.disabled = true;
+      actionBtn.textContent = "Jailbreaking...";
+      logMessage("[*] Starting jailbreak process...", "system");
 
-    // Cross-platform normalized event position scanner (Mas matibay laban sa touch drops)
-    function getClientX(e) {
-        if (e.touches && e.touches.length > 0) {
-            return e.touches[0].clientX;
-        }
-        if (e.changedTouches && e.changedTouches.length > 0) {
-            return e.changedTouches[0].clientX;
-        }
-        return e.clientX;
+      logs.forEach((item) => {
+        setTimeout(() => {
+          logMessage(item.text, item.style || "");
+        }, item.delay);
+      });
+
+      // Show completion after final log finishes (~145s)
+      setTimeout(() => {
+        finishJailbreak();
+      }, 145000);
     }
 
-    // Drag Event Listeners (Inayos para maging fluid at hindi ma-lock)
-    handle.addEventListener('mousedown', dragStart);
-    handle.addEventListener('touchstart', dragStart, { passive: false });
+    function finishJailbreak() {
+      actionBtn.textContent = "Jailbroken";
+      
+      // Native system notification request (if supported)
+      if ("Notification" in window && Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            new Notification("Jailbrik Complete", {
+              body: "Your phone is jailbroken! Cydia is ready.",
+              icon: "data:image/svg+xml;utf8,<svg xmlns='[w3.org](http://www.w3.org/2000/svg)' width='180' height='180' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23631919'/><text x='90' y='105' font-family='sans-serif' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>C</text></svg>"
+            });
+          }
+        });
+      }
 
-    document.addEventListener('mousemove', dragMove);
-    document.addEventListener('touchmove', dragMove, { passive: false });
-
-    document.addEventListener('mouseup', dragEnd);
-    document.addEventListener('touchend', dragEnd);
-
-    function dragStart(e) {
-        isDragging = true;
-        handle.style.transition = 'none';
-        startX = getClientX(e);
-        // Kunin ang kasalukuyang pwesto para iwas biglang talon ng knob
-        currentTransformX = 0;
+      // Show iOS Alert Modal
+      alertModal.classList.add("visible");
     }
 
-    function dragMove(e) {
-        if (!isDragging) return;
-        
-        // Pinapahinto ang browser body scrolling
-        if (e.cancelable) e.preventDefault();
-
-        const currentX = getClientX(e);
-        let deltaX = currentX - startX;
-
-        // Restricyon sa bounds ng slider track
-        if (deltaX < 0) deltaX = 0;
-Use code with caution.if (deltaX > maxTrackWidth) deltaX = maxTrackWidth;currentTransformX = deltaX;handle.style.transform = translateX(${deltaX}px);// Fade out effectsconst opacity = 1 - (deltaX / maxTrackWidth);sliderText.style.opacity = opacity;if (deltaX >= maxTrackWidth) {isDragging = false;triggerJailbreak();}}function dragEnd() {if (!isDragging) return;isDragging = false;// I-snap back pabalik sa unahan kung kulang ang swipe distanceif (currentTransformX < maxTrackWidth) {handle.style.transition = 'transform 0.3s ease';handle.style.transform = 'translateX(0px)';sliderText.style.opacity = 1;}}// Ang automated terminal logs framework sequenceasync function triggerJailbreak() {handle.style.display = 'none';wrapper.style.opacity = '0.3';wrapper.style.pointerEvents = 'none';statusBox.style.display = 'block';let currentLogs = "";// 1. Unang Text: Tatambay ng eksaktong 2.5 minuto (150,000ms) bago kumilos ang ibacurrentLogs += "[*] Initializing system vulnerability analysis...\n";statusBoxText.innerText = currentLogs;progressBar.style.width = "10%";await new Promise(resolve => setTimeout(resolve, 150000));// 2. Susunod na Terminal Logs: Sunod-sunod na lalabas na parang unc0ver app screenconst unc0verSteps = ["[] Exploiting WebKit sandbox structures...","[] Bypassing native kernel configurations...","[] Injecting untethered environments...","[+] Finalizing root security remounts...","[] unc0ver: Exploit success! Kernel base found.","[] unc0ver: Disabling amfid sandbox defenses...","[] unc0ver: Remounting RootFS as Read/Write...","[] unc0ver: Extracting bootstrap payload packages...","[] unc0ver: Installing root packages and binaries...","[*] unc0ver: Installing Cydia substrate environment...","[+] unc0ver: Successfully installed Cydia app manager!"];for (let i = 0; i < unc0verSteps.length; i++) {currentLogs += unc0verSteps[i] + "\n";statusBoxText.innerText = currentLogs;statusBoxText.scrollTop = statusBoxText.scrollHeight;let percentage = 10 + Math.round(((i + 1) / unc0verSteps.length) * 90);progressBar.style.width = percentage + "%";// Mabilis na terminal printing routine simulation (0.4s - 0.8s kada row)await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 400));}setTimeout(() => {alert("Your phone is now jailbroken!");}, 500);}
+    function closeAlert() {
+      alertModal.classList.remove("visible");
+      // Prompt user to add icon to home screen
+      pwaBanner.style.display = "block";
+    }
+  </script>
+</body>
+</html>
