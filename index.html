@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JailbrikMe iso 16  </title>
+    <title>JailbrikMe iso 16</title>
     <style>
         * {
             box-sizing: border-box;
@@ -44,6 +44,24 @@
         .header {
             text-align: center;
             margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Platform OS Detector Box sa pinakataas na gitna */
+        .os-detector {
+            font-size: 11px;
+            color: #3880ff;
+            background: rgba(56, 128, 255, 0.15);
+            border: 1px solid rgba(56, 128, 255, 0.3);
+            border-radius: 20px;
+            padding: 6px 16px;
+            display: inline-block;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
         }
 
         .logo {
@@ -81,17 +99,19 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 20px;
-            display: none; /* Hidden until triggered */
+            display: none;
             text-align: left;
         }
 
         .status-text {
             font-family: monospace;
-            font-size: 13px;
+            font-size: 11px;
             color: #00ff00;
             margin-bottom: 15px;
-            min-height: 40px;
-            line-height: 1.4;
+            height: 240px;
+            line-height: 1.5;
+            white-space: pre-line;
+            overflow-y: auto;
         }
 
         .progress-bar-container {
@@ -106,7 +126,7 @@
             width: 0%;
             height: 100%;
             background: #3880ff;
-            transition: width 0.4s ease;
+            transition: width 0.5s ease;
         }
 
         /* The Classic Slider */
@@ -122,6 +142,7 @@
             padding: 4px;
             margin-bottom: 40px;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            touch-action: none; /* Pinipigilan ang mobile browser scroll habang nagda-drag */
         }
 
         .slider-text {
@@ -155,6 +176,7 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.4);
             z-index: 2;
             transition: transform 0.1s ease-out;
+            touch-action: none;
         }
 
         .slider-handle:active {
@@ -179,8 +201,9 @@
 
 <div class="phone-screen">
 
-    <!-- Top Branding -->
+    <!-- Top Branding & Dynamic System Scanner -->
     <div class="header">
+        <div class="os-detector" id="osDetector">Detecting System...</div>
         <div class="logo">jailbreak<span>me</span></div>
         <div class="subtitle">Web-Based Jailbrikme made by amirhacks</div>
     </div>
@@ -188,7 +211,7 @@
     <!-- Middle UI (Flips between empty space and progress logs) -->
     <div class="main-content">
         <div class="status-box" id="statusBox">
-            <div class="status-text" id="statusText">Ready...</div>
+            <div class="status-text" id="statusBoxText">Ready...</div>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
@@ -208,23 +231,67 @@
     const wrapper = document.getElementById('sliderWrapper');
     const sliderText = document.getElementById('sliderText');
     const statusBox = document.getElementById('statusBox');
-    const statusText = document.getElementById('statusText');
+    const statusBoxText = document.getElementById('statusBoxText');
     const progressBar = document.getElementById('progressBar');
+    const osDetector = document.getElementById('osDetector');
 
     let isDragging = false;
     let startX = 0;
+    let currentTransformX = 0;
     let maxTrackWidth = 0;
 
-    // Calculate limits dynamically
+    // Automatic Environment Engine para basahin kung iOS o Android ang nagbukas
+    function runSystemDetection() {
+        const ua = navigator.userAgent;
+        if (/iPhone|iPad|iPod/.test(ua)) {
+            const match = ua.match(/OS (\d+)_(\d+)/);
+            if (match) {
+                osDetector.innerText = `iOS ${match[1]}.${match[2]} Device Connected`;
+            } else {
+                osDetector.innerText = "iOS Device Connected";
+            }
+        } else if (/Android/.test(ua)) {
+            const match = ua.match(/Android (\d+)/);
+            if (match) {
+                osDetector.innerText = `Android ${match[1]} Environment`;
+            } else {
+                osDetector.innerText = "Android Environment Detected";
+            }
+        } else if (/Windows/.test(ua)) {
+            osDetector.innerText = "Windows Machine Platform";
+        } else if (/Macintosh/.test(ua)) {
+            osDetector.innerText = "macOS Workstation";
+        } else if (/Linux/.test(ua)) {
+            osDetector.innerText = "Linux OS Environment";
+        } else {
+            osDetector.innerText = "64-Bit System Architecture";
+        }
+    }
+
     function updateLimits() {
-        maxTrackWidth = wrapper.clientWidth - handle.clientWidth - 8; // 8px for left/right paddings
+        maxTrackWidth = wrapper.clientWidth - handle.clientWidth - 8;
     }
     window.addEventListener('resize', updateLimits);
-    updateLimits();
+    
+    window.onload = () => {
+        updateLimits();
+        runSystemDetection();
+    };
 
-    // Drag Event Listeners (Supports Mouse & Touch)
+    // Cross-platform normalized event position scanner (Mas matibay laban sa touch drops)
+    function getClientX(e) {
+        if (e.touches && e.touches.length > 0) {
+            return e.touches[0].clientX;
+        }
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            return e.changedTouches[0].clientX;
+        }
+        return e.clientX;
+    }
+
+    // Drag Event Listeners (Inayos para maging fluid at hindi ma-lock)
     handle.addEventListener('mousedown', dragStart);
-    handle.addEventListener('touchstart', dragStart, { passive: true });
+    handle.addEventListener('touchstart', dragStart, { passive: false });
 
     document.addEventListener('mousemove', dragMove);
     document.addEventListener('touchmove', dragMove, { passive: false });
@@ -235,74 +302,20 @@
     function dragStart(e) {
         isDragging = true;
         handle.style.transition = 'none';
-        startX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+        startX = getClientX(e);
+        // Kunin ang kasalukuyang pwesto para iwas biglang talon ng knob
+        currentTransformX = 0;
     }
 
     function dragMove(e) {
         if (!isDragging) return;
+        
+        // Pinapahinto ang browser body scrolling
+        if (e.cancelable) e.preventDefault();
 
-        // Prevent scrolling page while sliding on mobile
-        if (e.type === 'touchmove') e.preventDefault();
-
-        const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+        const currentX = getClientX(e);
         let deltaX = currentX - startX;
 
-        // Restrict movement bounds
+        // Restricyon sa bounds ng slider track
         if (deltaX < 0) deltaX = 0;
-        if (deltaX > maxTrackWidth) deltaX = maxTrackWidth;
-
-        handle.style.transform = `translateX(${deltaX}px)`;
-
-        // Fade out the helper text as you slide
-        const opacity = 1 - (deltaX / maxTrackWidth);
-        sliderText.style.opacity = opacity;
-
-        // Trigger action if pushed all the way right
-        if (deltaX >= maxTrackWidth) {
-            isDragging = false;
-            triggerJailbreak();
-        }
-    }
-
-    function dragEnd() {
-        if (!isDragging) return;
-        isDragging = false;
-
-        // Snap back if let go early
-        handle.style.transition = 'transform 0.3s ease-out';
-        handle.style.transform = 'translateX(0px)';
-        sliderText.style.opacity = 1;
-    }
-
-    // Fake Execution Sequence
-    function triggerJailbreak() {
-        // Hide the slider smoothly
-        wrapper.style.transition = 'opacity 0.5s ease';
-        wrapper.style.opacity = '0';
-        setTimeout(() => wrapper.style.display = 'none', 500);
-
-        // Show and start logs
-        statusBox.style.display = 'block';
-
-        const steps = [
-            { text: "Locating user space vulnerability...", time: 1000, progress: 20 },
-            { text: "Bypassing sandbox restrictions...", time: 2200, progress: 45 },
-            { text: "Patching kernel memory maps...", time: 3500, progress: 75 },
-            { text: "Injecting Cydia environment...", time: 4800, progress: 95 },
-            { text: "Jailbreak Complete! (Simulated)", time: 5500, progress: 100 }
-        ];
-
-        steps.forEach(step => {
-            setTimeout(() => {
-                statusText.innerText = step.text;
-                progressBar.style.width = `${step.progress}%`;
-
-                if(step.progress === 100) {
-                    statusText.style.color = '#3880ff';
-                }
-            }, step.time);
-        });
-    }
-</script>
-</body>
-</html>
+Use code with caution.if (deltaX > maxTrackWidth) deltaX = maxTrackWidth;currentTransformX = deltaX;handle.style.transform = translateX(${deltaX}px);// Fade out effectsconst opacity = 1 - (deltaX / maxTrackWidth);sliderText.style.opacity = opacity;if (deltaX >= maxTrackWidth) {isDragging = false;triggerJailbreak();}}function dragEnd() {if (!isDragging) return;isDragging = false;// I-snap back pabalik sa unahan kung kulang ang swipe distanceif (currentTransformX < maxTrackWidth) {handle.style.transition = 'transform 0.3s ease';handle.style.transform = 'translateX(0px)';sliderText.style.opacity = 1;}}// Ang automated terminal logs framework sequenceasync function triggerJailbreak() {handle.style.display = 'none';wrapper.style.opacity = '0.3';wrapper.style.pointerEvents = 'none';statusBox.style.display = 'block';let currentLogs = "";// 1. Unang Text: Tatambay ng eksaktong 2.5 minuto (150,000ms) bago kumilos ang ibacurrentLogs += "[*] Initializing system vulnerability analysis...\n";statusBoxText.innerText = currentLogs;progressBar.style.width = "10%";await new Promise(resolve => setTimeout(resolve, 150000));// 2. Susunod na Terminal Logs: Sunod-sunod na lalabas na parang unc0ver app screenconst unc0verSteps = ["[] Exploiting WebKit sandbox structures...","[] Bypassing native kernel configurations...","[] Injecting untethered environments...","[+] Finalizing root security remounts...","[] unc0ver: Exploit success! Kernel base found.","[] unc0ver: Disabling amfid sandbox defenses...","[] unc0ver: Remounting RootFS as Read/Write...","[] unc0ver: Extracting bootstrap payload packages...","[] unc0ver: Installing root packages and binaries...","[*] unc0ver: Installing Cydia substrate environment...","[+] unc0ver: Successfully installed Cydia app manager!"];for (let i = 0; i < unc0verSteps.length; i++) {currentLogs += unc0verSteps[i] + "\n";statusBoxText.innerText = currentLogs;statusBoxText.scrollTop = statusBoxText.scrollHeight;let percentage = 10 + Math.round(((i + 1) / unc0verSteps.length) * 90);progressBar.style.width = percentage + "%";// Mabilis na terminal printing routine simulation (0.4s - 0.8s kada row)await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 400));}setTimeout(() => {alert("Your phone is now jailbroken!");}, 500);}
